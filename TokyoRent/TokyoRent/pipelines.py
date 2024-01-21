@@ -5,7 +5,9 @@
 
 
 # useful for handling different item types with a single interface
+import psycopg2 as pg
 from itemadapter import ItemAdapter
+from . import databaseinfo
 
 
 class TokyorentPipeline:
@@ -37,3 +39,69 @@ class TokyorentPipeline:
         
         return item
 
+
+
+"""
+create a databaseinfo.py file in this file's directory to extract the information of your database from.
+Fill the created file as followed:
+database_info = {
+    'host': 'enter the host ip of your postgres',
+    'dbname': 'enter your prepared database name',
+    'user': 'enter your user name',
+    'pwd': 'enter your password',
+}
+"""
+
+
+class SavePostgresqlPipeline:
+    def __init__(self):
+        database_info = databaseinfo.database_info
+
+        self.connection_dict = {
+            'host': database_info['host'],
+            'dbname': database_info['dbname'],
+            'user': database_info['user'],
+            'password': database_info['pwd']
+        }
+        self.conn = None
+        self.cur = None
+
+    def connect(self):
+        self.conn = pg.connect(**self.connection_dict)
+        self.cur = self.conn.cursor()
+    
+    def create_table(self):
+        self.cur.execute("CREATE TABLE IF NOT EXISTS rent\
+                                (detail TEXT,\
+                                price TEXT,\
+                                size TEXT,\
+                                deposite TEXT,\
+                                key_money TEXT,\
+                                floor TEXT, \
+                                year_built TEXT,\
+                                nearest_station TEXT);")
+        self.conn.commit()
+    
+    def insert_rent_data(self, item, spider ):
+        query = """
+            INSERT INTO rent (detail, price, size, deposite, key_money, floor, year_built, nearest_station)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
+        """
+        data = (item['detail'], item['price'], item['size'], item['deposite'], item['key_money'], item['floor'], item['year_built'], item['nearest_station'])
+        self.cur.execute(query, data)
+        self.conn.commit()
+        return item
+
+    def close_connection(self, spider):
+        self.cur.close()
+        self.conn.close()
+
+    def open_spider(self, spider):
+        self.connect()
+        self.create_table()
+
+    def process_item(self, item, spider):
+        return self.insert_rent_data(item, spider)
+
+    def spider_closed(self, spider):
+        self.close_connection(spider)
