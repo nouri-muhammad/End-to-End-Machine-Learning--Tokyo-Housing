@@ -10,3 +10,14 @@ class TokyorentItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     pass
+
+
+class HouseItems(scrapy.Item):
+    detail = scrapy.Field()
+    price = scrapy.Field()
+    size = scrapy.Field()
+    deposite = scrapy.Field()
+    key_money = scrapy.Field()
+    floor = scrapy.Field()
+    year_built = scrapy.Field()
+    nearest_station = scrapy.Field()
