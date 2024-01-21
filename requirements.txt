@@ -1,4 +1,8 @@
 scrapy
 ipython
 psycopg2
--e .
+pandas
+scikit-learn
+numpy
+pyarrow
+# -e .
