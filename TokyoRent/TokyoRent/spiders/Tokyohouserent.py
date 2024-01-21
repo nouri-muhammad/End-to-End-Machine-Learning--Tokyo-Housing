@@ -7,6 +7,7 @@ class TokyohouserentSpider(scrapy.Spider):
     name = "Tokyohouserent"
     allowed_domains = ["apartments.gaijinpot.com"]
     start_urls = ["https://apartments.gaijinpot.com"]
+    page = 1
     while True:
         try:
             count = int(input("how many pages do you want to scrape?: "))
@@ -43,8 +44,8 @@ class TokyohouserentSpider(scrapy.Spider):
                     }
         
         next_page = response.xpath(".//li[@class='pagination-next']/a/@href").get()
-        if next_page is not None and self.count<400:
-            self.count += 1
+        if next_page is not None and self.page<self.count:
+            self.page += 1
             time.sleep(random.uniform(1, 2))
             next_page_url = 'http://apartments.gaijinpot.com' + next_page
             yield response.follow(next_page_url, callback=self.parse)
