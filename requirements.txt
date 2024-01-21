@@ -1,0 +1,4 @@
+scrapy
+ipython
+psycopg2
+-e .
