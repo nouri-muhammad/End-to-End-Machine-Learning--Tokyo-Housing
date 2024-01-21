@@ -33,7 +33,7 @@ class TokyorentPipeline:
                     value = value[0]
                     first = value[:value.index('/')].strip()
                     second = value[value.index('/')+2:-1]
-                    adapter[field_name] = [first, second]
+                    adapter[field_name] = f"{first},{second}"
                 else:
                     adapter[field_name] = '' 
         
