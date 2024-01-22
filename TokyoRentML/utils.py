@@ -45,6 +45,101 @@ class ReadPostgresDataBase:
         return data
 
 
+class SaveTrainDataPostgresql:
+    def __init__(self):
+        database_info = databaseinfo.database_info
+        logging.info("Save Train Data Initiated")
+        self.connection_dict = {
+            'host': database_info['host'],
+            'dbname': database_info['dbname'],
+            'user': database_info['user'],
+            'password': database_info['pwd']
+        }
+        self.conn = None
+        self.cur = None
+
+    def connect(self):
+        logging.info("Connect to train DataBase")
+        self.conn = pg.connect(**self.connection_dict)
+        self.cur = self.conn.cursor()
+    
+    def create_table(self):
+        logging.info("Creating train Table")
+        self.cur.execute("CREATE TABLE IF NOT EXISTS train\
+                                (detail TEXT,\
+                                price BIGINT,\
+                                size NUMERIC(6,2),\
+                                deposit BIGINT,\
+                                key_money BIGINT,\
+                                year_built TEXT,\
+                                unit_floor NUMERIC(4,1), \
+                                total_floors NUMERIC(4,1), \
+                                nearest_station_distance_in_min INT);")
+        self.conn.commit()
+    
+    def insert_train_data(self, df: pd.DataFrame):
+        logging.info("Inserting Data into train Table")
+        query = """
+            INSERT INTO train (detail, price, size, deposit, key_money, year_built, unit_floor, total_floors, nearest_station_distance_in_min)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
+        """
+        data = [(row['detail'], row['price'], row['size'], row['deposit'], row['key_money'], row['year_built'], row['unit_floor'], row['total_floors'], row['nearest_station_distance_in_min']) for ind, row in df.iterrows()]
+        self.cur.executemany(query, data)
+        self.conn.commit()
+
+    def close_connection(self):
+        self.cur.close()
+        self.conn.close()
+
+
+class SaveTestDataPostgresql:
+    def __init__(self):
+        database_info = databaseinfo.database_info
+
+        self.connection_dict = {
+            'host': database_info['host'],
+            'dbname': database_info['dbname'],
+            'user': database_info['user'],
+            'password': database_info['pwd']
+        }
+        self.conn = None
+        self.cur = None
+
+    def connect(self):
+        logging.info("Connect to test DataBase")
+        self.conn = pg.connect(**self.connection_dict)
+        self.cur = self.conn.cursor()
+    
+    def create_table(self):
+        logging.info("Creating test Table")
+        self.cur.execute("CREATE TABLE IF NOT EXISTS test\
+                                (detail TEXT,\
+                                price BIGINT,\
+                                size NUMERIC(6,2),\
+                                deposit BIGINT,\
+                                key_money BIGINT,\
+                                year_built TEXT,\
+                                unit_floor NUMERIC(4,1), \
+                                total_floors NUMERIC(4,1), \
+                                nearest_station_distance_in_min INT);")
+        self.conn.commit()
+    
+    def insert_test_data(self, df: pd.DataFrame):
+        logging.info("Inserting Data into test Table")
+        query = """
+            INSERT INTO test (detail, price, size, deposit, key_money, year_built, unit_floor, total_floors, nearest_station_distance_in_min)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
+        """
+        data = [(row['detail'], row['price'], row['size'], row['deposit'], row['key_money'], row['year_built'], row['unit_floor'], row['total_floors'], row['nearest_station_distance_in_min']) for ind, row in df.iterrows()]
+        self.cur.executemany(query, data)
+        self.conn.commit()
+
+    def close_connection(self):
+        self.cur.close()
+        self.conn.close()
+
+
+
 def remove_after_white_space(x):
     if ' ' in x:
         return x.split(' ')[0]
