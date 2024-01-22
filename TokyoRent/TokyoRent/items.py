@@ -16,7 +16,7 @@ class HouseItems(scrapy.Item):
     detail = scrapy.Field()
     price = scrapy.Field()
     size = scrapy.Field()
-    deposite = scrapy.Field()
+    deposit = scrapy.Field()
     key_money = scrapy.Field()
     floor = scrapy.Field()
     year_built = scrapy.Field()

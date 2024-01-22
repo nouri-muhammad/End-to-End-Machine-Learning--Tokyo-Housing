@@ -21,7 +21,7 @@ class TokyorentPipeline:
             elif field_name == 'size':
                 value = adapter.get(field_name)
                 adapter[field_name] = value[0][:-3]
-            elif field_name == 'deposite':
+            elif field_name == 'deposit':
                 value = adapter.get(field_name)
                 adapter[field_name] = value[0][1:]
             elif field_name == 'key_money':
@@ -75,7 +75,7 @@ class SavePostgresqlPipeline:
                                 (detail TEXT,\
                                 price TEXT,\
                                 size TEXT,\
-                                deposite TEXT,\
+                                deposit TEXT,\
                                 key_money TEXT,\
                                 floor TEXT, \
                                 year_built TEXT,\
@@ -84,10 +84,10 @@ class SavePostgresqlPipeline:
     
     def insert_rent_data(self, item, spider ):
         query = """
-            INSERT INTO rent (detail, price, size, deposite, key_money, floor, year_built, nearest_station)
+            INSERT INTO rent (detail, price, size, deposit, key_money, floor, year_built, nearest_station)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
         """
-        data = (item['detail'], item['price'], item['size'], item['deposite'], item['key_money'], item['floor'], item['year_built'], item['nearest_station'])
+        data = (item['detail'], item['price'], item['size'], item['deposit'], item['key_money'], item['floor'], item['year_built'], item['nearest_station'])
         self.cur.execute(query, data)
         self.conn.commit()
         return item
