@@ -1,7 +1,4 @@
-import os
-import pandas as pd 
 import sys
-from dataclasses import dataclass
 from sklearn.model_selection import train_test_split
 from TokyoRentML.components.data_transformation import DataTransformation
 from TokyoRentML.exception import CustomException
@@ -12,7 +9,6 @@ from TokyoRentML.utils import (
     remove_comma, 
     floor_to_tuple, 
     station_cleaning,
-    extract_detail,
     split_floor_column,
     SaveTrainDataPostgresql,
     SaveTestDataPostgresql

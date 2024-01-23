@@ -261,20 +261,6 @@ def station_cleaning(x):
     return sum(int(m) for m in minutes)
 
 
-def extract_detail(x):
-    """
-    from details column only the middle part of the address might be usefull in large amount of data.
-    The last part is the city of Tokyo which is the city and same for all the data, so there is no use in it.
-    The first part is the exact location of the apartment, and there are too many unique values thus
-        it will be almost unique for each entery and is of no use.
-    The second part is the only part that is of use which is the broader location. 
-    """
-    # Extract the second part between commas
-    second_part = re.search(r',\s*"(.*?),', x).group(1)    
-    # Return second part
-    return second_part
-
-
 def save_object(file_path, obj):
     try:
         dir_path = os.path.dirname(file_path)
