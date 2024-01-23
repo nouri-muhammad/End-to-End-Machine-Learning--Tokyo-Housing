@@ -1,8 +1,12 @@
+import dill 
 import numpy as np
+import os
 import pandas as pd
 import psycopg2 as pg
 import re
+import sys 
 from TokyoRentML import databaseinfo
+from TokyoRentML.exception import CustomException
 from TokyoRentML.logger import logging
 
 
@@ -66,8 +70,7 @@ class SaveTrainDataPostgresql:
     def create_table(self):
         logging.info("Creating train Table")
         self.cur.execute("CREATE TABLE IF NOT EXISTS train\
-                                (detail TEXT,\
-                                price BIGINT,\
+                                (price BIGINT,\
                                 size NUMERIC(6,2),\
                                 deposit BIGINT,\
                                 key_money BIGINT,\
@@ -80,16 +83,54 @@ class SaveTrainDataPostgresql:
     def insert_train_data(self, df: pd.DataFrame):
         logging.info("Inserting Data into train Table")
         query = """
-            INSERT INTO train (detail, price, size, deposit, key_money, year_built, unit_floor, total_floors, nearest_station_distance_in_min)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
+            INSERT INTO train (price, size, deposit, key_money, year_built, unit_floor, total_floors, nearest_station_distance_in_min)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
         """
-        data = [(row['detail'], row['price'], row['size'], row['deposit'], row['key_money'], row['year_built'], row['unit_floor'], row['total_floors'], row['nearest_station_distance_in_min']) for ind, row in df.iterrows()]
+        data = [(row['price'], row['size'], row['deposit'], row['key_money'], row['year_built'], row['unit_floor'], row['total_floors'], row['nearest_station_distance_in_min']) for ind, row in df.iterrows()]
         self.cur.executemany(query, data)
         self.conn.commit()
 
     def close_connection(self):
         self.cur.close()
         self.conn.close()
+
+
+class ReadTrainData:
+    def __init__(self):
+        database_info = databaseinfo.database_info
+        self.connection_dict = {
+            'host': database_info['host'],
+            'dbname': database_info['dbname'],
+            'user': database_info['user'],
+            'password': database_info['pwd']
+        }
+        self.conn = None
+        self.cur = None
+
+    def connect(self):
+        self.conn = pg.connect(**self.connection_dict)
+        self.cur = self.conn.cursor()
+
+    def load_data(self):
+        query = """ SELECT 
+                price, size, deposit, key_money, year_built, unit_floor, total_floors, nearest_station_distance_in_min
+                FROM train;
+                """
+        self.cur.execute(query)
+        rows = self.cur.fetchall()
+
+        data = pd.DataFrame(rows, columns=['price', 'size', 'deposit', 'key_money', 'year_built', 'unit_floor', 'total_floors', 'nearest_station_distance_in_min'])
+        return data
+
+    def close_connection(self):
+        self.cur.close()
+        self.conn.close()
+
+    def read_data(self):
+        self.connect()
+        data = self.load_data()
+        self.close_connection()
+        return data
 
 
 class SaveTestDataPostgresql:
@@ -113,8 +154,7 @@ class SaveTestDataPostgresql:
     def create_table(self):
         logging.info("Creating test Table")
         self.cur.execute("CREATE TABLE IF NOT EXISTS test\
-                                (detail TEXT,\
-                                price BIGINT,\
+                                (price BIGINT,\
                                 size NUMERIC(6,2),\
                                 deposit BIGINT,\
                                 key_money BIGINT,\
@@ -127,10 +167,10 @@ class SaveTestDataPostgresql:
     def insert_test_data(self, df: pd.DataFrame):
         logging.info("Inserting Data into test Table")
         query = """
-            INSERT INTO test (detail, price, size, deposit, key_money, year_built, unit_floor, total_floors, nearest_station_distance_in_min)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
+            INSERT INTO test (price, size, deposit, key_money, year_built, unit_floor, total_floors, nearest_station_distance_in_min)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
         """
-        data = [(row['detail'], row['price'], row['size'], row['deposit'], row['key_money'], row['year_built'], row['unit_floor'], row['total_floors'], row['nearest_station_distance_in_min']) for ind, row in df.iterrows()]
+        data = [(row['price'], row['size'], row['deposit'], row['key_money'], row['year_built'], row['unit_floor'], row['total_floors'], row['nearest_station_distance_in_min']) for ind, row in df.iterrows()]
         self.cur.executemany(query, data)
         self.conn.commit()
 
@@ -138,6 +178,43 @@ class SaveTestDataPostgresql:
         self.cur.close()
         self.conn.close()
 
+
+class ReadTestData:
+    def __init__(self):
+        database_info = databaseinfo.database_info
+        self.connection_dict = {
+            'host': database_info['host'],
+            'dbname': database_info['dbname'],
+            'user': database_info['user'],
+            'password': database_info['pwd']
+        }
+        self.conn = None
+        self.cur = None
+
+    def connect(self):
+        self.conn = pg.connect(**self.connection_dict)
+        self.cur = self.conn.cursor()
+
+    def load_data(self):
+        query = """ SELECT 
+                price, size, deposit, key_money, year_built, unit_floor, total_floors, nearest_station_distance_in_min
+                FROM test;
+                """
+        self.cur.execute(query)
+        rows = self.cur.fetchall()
+
+        data = pd.DataFrame(rows, columns=['price', 'size', 'deposit', 'key_money', 'year_built', 'unit_floor', 'total_floors', 'nearest_station_distance_in_min'])
+        return data
+
+    def close_connection(self):
+        self.cur.close()
+        self.conn.close()
+
+    def read_data(self):
+        self.connect()
+        data = self.load_data()
+        self.close_connection()
+        return data
 
 
 def remove_after_white_space(x):
@@ -198,3 +275,11 @@ def extract_detail(x):
     return second_part
 
 
+def save_object(file_path, obj):
+    try:
+        dir_path = os.path.dirname(file_path)
+        os.makedirs(dir_path, exist_ok=True)
+        with open(file=file_path, mode="wb") as file_obj:
+            dill.dump(obj, file_obj)
+    except Exception as e:
+        raise CustomException(e, sys)

@@ -3,6 +3,7 @@ import pandas as pd
 import sys
 from dataclasses import dataclass
 from sklearn.model_selection import train_test_split
+from TokyoRentML.components.data_transformation import DataTransformation
 from TokyoRentML.exception import CustomException
 from TokyoRentML.logger import logging
 from TokyoRentML.utils import (
@@ -58,8 +59,8 @@ class DataIngestion:
             df['nearest_station_distance_in_min'] = df['nearest_station_distance_in_min'].astype('int')
             df.drop(columns=['nearest_station'], axis=1, inplace=True)
 
-            logging.info("Clean detail Column")
-            df['detail'] = df['detail'].apply(extract_detail)
+            logging.info("Drop detail Column")
+            df.drop(columns=['detail'], axis=1, inplace=True)
 
             logging.info("Dropping Rows With Null Values")
             df.dropna(inplace=True)
@@ -82,6 +83,8 @@ class DataIngestion:
             test.insert_test_data(test_set)
             test.close_connection()
 
+            logging.info("Ingestion Process Completed")
+
         except Exception as e:
             raise CustomException(e, sys) 
 
@@ -90,6 +93,8 @@ if __name__=='__main__':
     obj = DataIngestion()
     obj.initiate_data_ingestion()
 
+    data_transformation = DataTransformation()
+    train_array, test_array, preprocessor_obj_file_path = data_transformation.initiate_data_transformation()
 
 
 
