@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 from TokyoRentML.components.data_transformation import DataTransformation
 from TokyoRentML.exception import CustomException
 from TokyoRentML.logger import logging
+from TokyoRentML.components.model_trainer import ModelTrainer
 from TokyoRentML.utils import (
     ReadPostgresDataBase, 
     remove_after_white_space, 
@@ -92,5 +93,5 @@ if __name__=='__main__':
     data_transformation = DataTransformation()
     train_array, test_array, preprocessor_obj_file_path = data_transformation.initiate_data_transformation()
 
-
-
+    model_trainer = ModelTrainer()
+    result = model_trainer.initiate_model_trainer(train_array, test_array)
