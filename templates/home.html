@@ -1,0 +1,59 @@
+<html>
+<body>
+    <div class="login">
+   
+       <form action="{{ url_for('predict_datapoint')}}" method="post">
+        <h1>
+            <legend>Apartment Rent Price Predictor</legend>
+        </h1>
+        <div class="mb-3">
+            <label class="form-label">Enter size of the apartment</label>
+            <input class="form-control" type="number" name="size"
+                placeholder="Enter size of the apartment" min='0' max='1000' />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Enter the deposite you can afford</label>
+            <input class="form-control" type="number" name="deposit"
+                placeholder="Enter deposit" min='0' max='10000000' />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Enter the key money you can afford</label>
+            <input class="form-control" type="number" name="key_money"
+                placeholder="Enter deposit" min='0' max='10000000' />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Enter the apartment age (year built)</label>
+            <input class="form-control" type="number" name="year_built"
+                placeholder="Enter the apartment age (year built)" min='1990' max='2024' />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Enter the floor you want to live</label>
+            <input class="form-control" type="number" name="unit_floor"
+                placeholder="Enter the floor you want to live" min='0' max='100' />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Enter apartment's total floors</label>
+            <input class="form-control" type="number" name="total_floors"
+                placeholder="Enter apartment's total floors" min='0' max='100' />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Enter the distance to the nearest station in minutes</label>
+            <input class="form-control" type="number" name="nearest_station_distance_in_min"
+                placeholder="Enter the distance to the nearest station in minutes" min='0' max='100' />
+        </div>
+
+        <div class="mb-3">
+            <input class="btn btn-primary" type="submit" value="Predict the Rent Value" required />
+        </div>
+    </form>
+    <h2>
+       THE prediction is {{results}}
+    </h2>
+   <body>
+</html>

@@ -31,7 +31,7 @@ class ReadPostgresDataBase:
 
     def load_data(self):
         query = """ SELECT 
-                detail, price, size, deposite, key_money, floor, year_built, nearest_station
+                detail, price, size, deposit, key_money, floor, year_built, nearest_station
                 FROM rent;
                 """
         self.cur.execute(query)
@@ -294,5 +294,13 @@ def evaluate_models(x_train, y_train, x_test, y_test, models, params):
             logging.info(f"Model: {name} Uptimization is Done!")
 
         return report, fitters
+    except Exception as e:
+        raise CustomException(e, sys)
+
+
+def load_object(file_path):
+    try:
+        with open(file_path, "rb") as file_obj:
+            return dill.load(file_obj)
     except Exception as e:
         raise CustomException(e, sys)
