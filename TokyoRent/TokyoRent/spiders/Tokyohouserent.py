@@ -1,3 +1,4 @@
+import os 
 import scrapy
 import random
 import time
@@ -11,7 +12,7 @@ class TokyohouserentSpider(scrapy.Spider):
     page = 1
     while True:
         try:
-            count = int(input("how many pages do you want to scrape?: "))
+            count = int(os.environ.get('PAGES', 0))
             break
         except ValueError:
              print("Invalid Entry")
