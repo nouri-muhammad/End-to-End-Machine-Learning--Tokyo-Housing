@@ -22,7 +22,8 @@ In this project:
 
     This file is used to connect to database inside your local system (it uses the created database)
 
-1. run the following command:   python automating.py
+1. run the following command:   python automating.py num
+   1.1    replace num with an integer, it will be the number of pages you want to script (each page contains 15 data) 
 
 The project starts with scraping and saving the data in a postgres database called "tokyohousing";
 then it initializes the MLFlow by loading the data from database, clean the data (preprocessing), save preprocessor.pkl file,
